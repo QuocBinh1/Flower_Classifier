@@ -10,9 +10,8 @@ class FlowerClassifier:
         self.num_classes = num_classes
         self.img_size = img_size
         self.model = None
-        
+    #tạo model CNN
     def create_cnn_model(self):
-        """Tạo model CNN đơn giản"""
         model = models.Sequential([
             layers.Conv2D(32, (3, 3), activation='relu', input_shape=(*self.img_size, 3)),
             layers.MaxPooling2D((2, 2)),

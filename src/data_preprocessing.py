@@ -29,9 +29,9 @@ class DataPreprocessor:
                             # Đọc và resize ảnh
                             img = cv2.imread(img_path)
                             if img is not None:
-                                img = cv2.resize(img, self.img_size)
+                                img = cv2.resize(img, self.img_size) #resize ảnh về 224x224
                                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                                img = img / 255.0  # Chuẩn hóa pixel values
+                                img = img.astype(np.float32) / 255.0  # Chuẩn hóa pixel values [0,1]
                                 
                                 images.append(img)
                                 labels.append(class_name)
@@ -41,14 +41,14 @@ class DataPreprocessor:
         print(f"Đã tải {len(images)} ảnh từ {len(set(labels))} loài hoa")
         return np.array(images), np.array(labels)
     
+    #chuyển nhãn thành số , daisy -> 0 . dandelion -> 1
     def encode_labels(self, labels):
-        """Mã hóa nhãn thành số"""
         label_encoder = LabelEncoder()
         encoded_labels = label_encoder.fit_transform(labels)
         return encoded_labels, label_encoder
     
+    #chia train 60 , test 20 , val 20
     def split_data(self, images, labels, test_size=0.2, val_size=0.2):
-        """Chia dữ liệu thành train, validation và test"""
         # Chia train và test
         X_train, X_test, y_train, y_test = train_test_split(
             images, labels, test_size=test_size, random_state=42, stratify=labels
@@ -94,6 +94,8 @@ def main():
     X_train, X_val, X_test, y_train, y_val, y_test = preprocessor.split_data(
         images, encoded_labels
     )
+    X_train, X_val, X_test = map(np.array, [X_train, X_val, X_test])
+
     
     # Lưu label encoder
     with open('label_encoder.pkl', 'wb') as f:
